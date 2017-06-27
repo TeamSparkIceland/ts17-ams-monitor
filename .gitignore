@@ -1,0 +1,3 @@
+*.exe
+bindata.go
+vendor/
