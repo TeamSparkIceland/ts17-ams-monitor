@@ -18,8 +18,11 @@ var RootCmd = &cobra.Command{
 func init() {
 	runtime.LockOSThread()
 	RootCmd.Flags().StringP("port", "p", "COM1", "Serial port")
+	RootCmd.Flags().BoolP("dryrun", "d", false, "Fake data instead of serial communication")
 	viper.BindPFlag("port", RootCmd.Flags().Lookup("port"))
+	viper.BindPFlag("dryrun", RootCmd.Flags().Lookup("dryrun"))
 	viper.SetDefault("port", "COM1")
+	viper.SetDefault("dryrun", false)
 }
 
 func createPackData() []Pack {
@@ -76,7 +79,13 @@ func app() {
 	quitC := make(chan struct{})
 	received := make(chan string)
 
-	go listen(viper.GetString("port"), 115200, received, quitC)
+	if viper.GetBool("dryrun") {
+		log.Warn("Using dummy data instead of live data (dryrun option)")
+		go dummyListen(received, quitC)
+	} else {
+		go listen(viper.GetString("port"), 115200, received, quitC)
+	}
+
 	go dataReceiver(state, received)
 
 	state.PackData = createPackData()
