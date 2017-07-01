@@ -69,7 +69,7 @@ func guiLoop(config *Config, state *State) {
 	//dataMan := NewBmsDataManager()
 	//dataMan.Set(BmsData{Packs: []Pack{pack}})
 
-	fpsTicker := time.NewTicker(time.Second / 30)
+	fpsTicker := time.NewTicker(time.Second / 60)
 
 	for {
 		select {
@@ -114,7 +114,7 @@ func gfxMain(win *glfw.Window, ctx *nk.Context, config *Config, state *State, id
 	// Render
 	gl.Viewport(0, 0, int32(width), int32(height))
 	gl.Clear(gl.COLOR_BUFFER_BIT)
-	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
+	gl.ClearColor(0.0, 0.0, 0.0, 1.0)
 	nk.NkPlatformRender(nk.AntiAliasingOn, maxVertexBuffer, maxElementBuffer)
 	win.SwapBuffers()
 

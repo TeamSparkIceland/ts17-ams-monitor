@@ -21,10 +21,12 @@ type Cell struct {
 	Temperature         float32
 	VoltagePecError     bool
 	TemperaturePecError bool
+	DischargeActive     bool
 }
 
 type Pack struct {
-	Cells []Cell
+	Cells   []Cell
+	Voltage float32
 }
 
 type State struct {

@@ -25,9 +25,19 @@ func makePackFrame(ctx *nk.Context, config *Config, state *State, idFont *nk.Fon
 			nk.NkLayoutRowDynamic(ctx, 14, 3)
 			{
 				nk.NkLabel(ctx, fmt.Sprintf("C%d", i), nk.TextLeft)
-				nk.NkLabel(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft)
+				if cell.DischargeActive {
+					color := nk.NkRgba(102, 178, 255, 255)
+					nk.NkLabelColored(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft, color)
+				} else {
+					nk.NkLabel(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft)
+				}
 				nk.NkLabel(ctx, fmt.Sprintf("%.2f C", cell.Temperature), nk.TextLeft)
 			}
+		}
+
+		nk.NkLayoutRowDynamic(ctx, 30, 1)
+		{
+			nk.NkLabel(ctx, fmt.Sprintf("%.2f V", state.PackData[i].Voltage), nk.TextCentered)
 		}
 
 	}
