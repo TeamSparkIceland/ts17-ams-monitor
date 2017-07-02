@@ -1,3 +1,4 @@
 *.exe
 bindata.go
 vendor/
+*.swp

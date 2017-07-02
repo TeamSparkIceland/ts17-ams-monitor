@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 func generateDataPackets() []string {
@@ -12,11 +13,17 @@ func generateDataPackets() []string {
 		for cellId := 0; cellId < 12; cellId++ {
 			voltage := int((rand.Float32() + 3.1) * 1000)
 			temperature := int((rand.Float32() * 40) + 15)
-			packLine += fmt.Sprintf("%d|%d|%d|", cellId, voltage, temperature)
+			discharge := 0
+			packLine += fmt.Sprintf("%d|%d|%d|%d|", cellId, voltage, temperature, discharge)
 		}
 		result = append(result, packLine)
 	}
 	return result
+}
+
+func generateStatusPacket() string {
+	voltage := int((rand.Float32() + 3.1) * 1000)
+	return fmt.Sprintf("S|%d|", voltage)
 }
 
 func dummyListen(received chan string, quitC chan struct{}) {
@@ -24,10 +31,11 @@ func dummyListen(received chan string, quitC chan struct{}) {
 		select {
 		case <-quitC:
 			return
-		default:
+		case <-time.After(1 * time.Second):
 		}
 		for _, line := range generateDataPackets() {
 			received <- line
 		}
+		received <- generateStatusPacket()
 	}
 }

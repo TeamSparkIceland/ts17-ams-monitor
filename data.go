@@ -1,5 +1,7 @@
 package main
 
+// Serial data structures and handling
+
 import (
 	log "github.com/sirupsen/logrus"
 	"strconv"
@@ -7,22 +9,44 @@ import (
 )
 
 const (
-	PACKET_START_CHAR     = 'D'
-	PACKET_DELIMITER      = "|"
-	VALID_DELIMITER_COUNT = 49
+	PACKET_START_CHAR      = 'D'
+	PACKET_DELIMITER       = "|"
+	VALID_DELIMITER_COUNT  = 49
+	CELLS_IN_PACK          = 12
+	PACKS_IN_SYSTEM        = 12
+	STATUS_DELIMITER_COUNT = 2
+	STATUS_START_CHAR      = 'S'
 )
 
-func isDataPacket(packet string) bool {
-	if packet[0] != PACKET_START_CHAR {
+func validatePacket(packet string, startChar byte, delimiterCount int) bool {
+	if packet[0] != startChar {
 		return false
 	}
 
-	if strings.Count(packet, PACKET_DELIMITER) != VALID_DELIMITER_COUNT {
+	if strings.Count(packet, PACKET_DELIMITER) != delimiterCount {
 		log.Warnf("Datapacket has invalid delimiter count: %s\n", packet)
 		return false
 	}
 
 	return true
+}
+
+func isDataPacket(packet string) bool {
+	return validatePacket(packet, PACKET_START_CHAR, VALID_DELIMITER_COUNT)
+}
+
+func isStatusPacket(packet string) bool {
+	return validatePacket(packet, STATUS_START_CHAR, STATUS_DELIMITER_COUNT)
+}
+
+func parseStatusPacket(packet string, state *State) {
+	parts := strings.Split(packet[1:], PACKET_DELIMITER)[1:]
+	dischargeVoltage, err := strconv.Atoi(parts[0])
+	if err != nil {
+		log.Warnf("Failed to convert discharge voltage %s to integer", parts[0])
+		return
+	}
+	state.DischargeTargetVoltage = float32(dischargeVoltage) / 1000.0
 }
 
 /*
@@ -87,5 +111,23 @@ func parseDataPacket(packet string, state *State) {
 
 	}
 	state.PackData[bmsId].Voltage = totalVoltage
+}
 
+func createPackData(volt, temp float64, voltPec, tempPec bool) []Pack {
+	result := make([]Pack, PACKS_IN_SYSTEM)
+	for i := 0; i < len(result); i++ {
+		cells := make([]Cell, CELLS_IN_PACK)
+		for j := 0; j < len(result); j++ {
+			cells[j] = Cell{
+				Voltage:             float32(volt),
+				Temperature:         float32(temp),
+				VoltagePecError:     voltPec,
+				TemperaturePecError: tempPec,
+			}
+		}
+		result[i] = Pack{
+			Cells: cells,
+		}
+	}
+	return result
 }

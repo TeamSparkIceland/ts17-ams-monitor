@@ -19,7 +19,7 @@ func connect(port string, baudrate int) *serial.Port {
 	return s
 }
 
-func listen(port string, baudrate int, received chan<- string, quitC <-chan struct{}) {
+func listen(port string, baudrate int, received chan<- string, outbound <-chan string, quitC <-chan struct{}) {
 	s := connect(port, baudrate)
 	defer s.Close()
 
@@ -49,6 +49,9 @@ func listen(port string, baudrate int, received chan<- string, quitC <-chan stru
 		}
 
 		select {
+		case o := <-outbound:
+			log.Infof("Sending %s to serial", o)
+			s.Write([]byte(o))
 		case <-quitC:
 			return
 		default:

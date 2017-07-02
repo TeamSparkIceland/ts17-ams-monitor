@@ -10,6 +10,96 @@ const (
 	packFrameHeight = 300
 )
 
+func filler(ctx *nk.Context, height float32) {
+	nk.NkLayoutRowStatic(ctx, height, 0, 0)
+}
+
+func makeSidebarFrame(ctx *nk.Context, state *State, x, y, w, h float32) {
+	windowFlags := (nk.Flags)(nk.WindowNoScrollbar)
+	nk.NkPlatformNewFrame()
+	bounds := nk.NkRect(x, y, w, h)
+
+	update := nk.NkBegin(ctx, "Sidebar", bounds, windowFlags)
+
+	if update > 0 {
+		filler(ctx, 10)
+		nk.NkLayoutRowDynamic(ctx, 60, 1)
+		{
+
+			//if nk.NkButtonLabel(ctx, "CONN") > 0 {
+			//}
+
+			if state.DischargeRequested {
+				if nk.NkButtonSymbolLabel(ctx, nk.SymbolRectSolid, "Discharge", nk.TextCentered) > 0 {
+					state.DischargeRequested = !state.DischargeRequested
+				}
+			} else {
+				if nk.NkButtonSymbolLabel(ctx, nk.SymbolRectOutline, "Discharge", nk.TextCentered) > 0 {
+					state.DischargeRequested = !state.DischargeRequested
+				}
+			}
+
+		}
+		if state.DischargeRequested {
+			nk.NkLayoutRowDynamic(ctx, 14, 1)
+			{
+				nk.NkLabel(ctx, "Target Voltage", nk.TextCentered)
+				color := nk.NkRgba(102, 178, 255, 255)
+				nk.NkLabelColored(ctx, fmt.Sprintf("%.2f V", state.DischargeTargetVoltage), nk.TextCentered, color)
+			}
+		}
+	}
+	nk.NkEnd(ctx)
+}
+
+func makeSegmentFrame(ctx *nk.Context, state *State, segmentId int, x, y, w, h float32) {
+	windowFlags := (nk.Flags)(nk.WindowBorder | nk.WindowNoScrollbar | nk.WindowTitle)
+	frameId := fmt.Sprintf("SEGMENT %d", segmentId)
+	nk.NkPlatformNewFrame()
+	bounds := nk.NkRect(x, y, w, h)
+
+	update := nk.NkBeginTitled(ctx, frameId, frameId, bounds, windowFlags)
+	if update > 0 {
+
+		totalVoltage := state.PackData[(segmentId*2)].Voltage + state.PackData[(segmentId*2)+1].Voltage
+
+		nk.NkLayoutRowDynamic(ctx, 30, 1)
+		{
+			//		nk.NkStylePushFont(ctx, largeFont.Handle())
+			nk.NkLabel(ctx, fmt.Sprintf("%.2f V", totalVoltage), nk.TextCentered)
+			//		nk.NkStylePopFont(ctx)
+		}
+
+		nk.NkLayoutRowDynamic(ctx, 260, 1)
+		{
+
+			for packId := 0; packId < 2; packId++ {
+				nk.NkGroupBegin(ctx, fmt.Sprintf("S%d-P%d", segmentId, packId), nk.WindowBorder|nk.WindowNoScrollbar|nk.WindowTitle)
+				makePackLayout(ctx, state, (segmentId*2)+packId)
+				nk.NkGroupEnd(ctx)
+			}
+
+		}
+	}
+	nk.NkEnd(ctx)
+}
+
+func makePackLayout(ctx *nk.Context, state *State, packId int) {
+	for i, cell := range state.PackData[packId].Cells {
+		nk.NkLayoutRowDynamic(ctx, 14, 3)
+		{
+			nk.NkLabel(ctx, fmt.Sprintf("C%d", i), nk.TextLeft)
+			if cell.DischargeActive {
+				color := nk.NkRgba(102, 178, 255, 255)
+				nk.NkLabelColored(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft, color)
+			} else {
+				nk.NkLabel(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft)
+			}
+			nk.NkLabel(ctx, fmt.Sprintf("%.2f C", cell.Temperature), nk.TextLeft)
+		}
+	}
+}
+
 func makePackFrame(ctx *nk.Context, config *Config, state *State, idFont *nk.Font, i int, x, y, w, h float32) {
 	windowFlags := (nk.Flags)(nk.WindowBorder | nk.WindowNoScrollbar | nk.WindowTitle)
 
@@ -21,20 +111,7 @@ func makePackFrame(ctx *nk.Context, config *Config, state *State, idFont *nk.Fon
 
 	if nk.NkBeginTitled(ctx, frameId, frameId, bounds, windowFlags) > 0 {
 
-		for i, cell := range state.PackData[i].Cells {
-			nk.NkLayoutRowDynamic(ctx, 14, 3)
-			{
-				nk.NkLabel(ctx, fmt.Sprintf("C%d", i), nk.TextLeft)
-				if cell.DischargeActive {
-					color := nk.NkRgba(102, 178, 255, 255)
-					nk.NkLabelColored(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft, color)
-				} else {
-					nk.NkLabel(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft)
-				}
-				nk.NkLabel(ctx, fmt.Sprintf("%.2f C", cell.Temperature), nk.TextLeft)
-			}
-		}
-
+		makePackLayout(ctx, state, i)
 		nk.NkLayoutRowDynamic(ctx, 30, 1)
 		{
 			nk.NkLabel(ctx, fmt.Sprintf("%.2f V", state.PackData[i].Voltage), nk.TextCentered)

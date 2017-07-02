@@ -30,13 +30,23 @@ type Pack struct {
 }
 
 type State struct {
-	HideDataLog bool
-	LogData     []string
-	PackData    []Pack
+	HideDataLog            bool
+	LogData                []string
+	PackData               []Pack
+	DischargeRequested     bool
+	DischargeTargetVoltage float32
 }
 
 func NewDefaultConfig() *Config {
 	return &Config{
 		CellConfig: CellConfig{3.0, 4.2, 5.0, 55.0},
+	}
+}
+
+func NewDefaultState() *State {
+	return &State{
+		HideDataLog:        false,
+		LogData:            make([]string, 0, LOG_LINES_MAX),
+		DischargeRequested: false,
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	WINDOW_WIDTH  = 1200
+	WINDOW_WIDTH  = 1570
 	WINDOW_HEIGHT = 1000
 
 	SCROLL_LEN = 2048
@@ -29,7 +29,7 @@ func setupWindow() *glfw.Window {
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 
-	win, err := glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Nuklear Demo", nil, nil)
+	win, err := glfw.CreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "TS17 AMS Monitor", nil, nil)
 	if err != nil {
 		closer.Fatalln(err)
 	}
@@ -53,7 +53,7 @@ func guiLoop(config *Config, state *State) {
 	atlas := nk.NewFontAtlas()
 	nk.NkFontStashBegin(&atlas)
 	sansFont := nk.NkFontAtlasAddFromBytes(atlas, MustAsset("assets/FreeSans.ttf"), 16, nil)
-	idFont := nk.NkFontAtlasAddFromBytes(atlas, MustAsset("assets/FreeSans.ttf"), 32, nil)
+	idFont := nk.NkFontAtlasAddFromBytes(atlas, MustAsset("assets/FreeSans.ttf"), 24, nil)
 	nk.NkFontStashEnd()
 	if sansFont != nil {
 		nk.NkStyleSetFont(ctx, sansFont.Handle())
@@ -65,9 +65,6 @@ func guiLoop(config *Config, state *State) {
 		close(exitC)
 		<-doneC
 	})
-
-	//dataMan := NewBmsDataManager()
-	//dataMan.Set(BmsData{Packs: []Pack{pack}})
 
 	fpsTicker := time.NewTicker(time.Second / 60)
 
@@ -90,25 +87,37 @@ func guiLoop(config *Config, state *State) {
 	}
 }
 
-func gfxMain(win *glfw.Window, ctx *nk.Context, config *Config, state *State, idFont *nk.Font) {
+func makeSegmentScreen(ctx *nk.Context, state *State, x, y, w, h float32) {
+	var padding float32 = 10
+	segmentHeight := h - (2 * padding)
+	segmentCount := 6
+	segmentWidth := (w - (padding * (float32(segmentCount) + 1))) / float32(segmentCount)
 
+	for segmentId := 0; segmentId < segmentCount; segmentId++ {
+		makeSegmentFrame(
+			ctx,
+			state,
+			segmentId,
+			x+padding+(float32(segmentId)*(segmentWidth+padding)),
+			y+padding,
+			segmentWidth,
+			segmentHeight,
+		)
+	}
+}
+
+func gfxMain(win *glfw.Window, ctx *nk.Context, config *Config, state *State, idFont *nk.Font) {
 	width, height := win.GetSize()
 
-	x := 0
-	y := 0
+	sidebarWidth := 150
 
-	for i, _ := range state.PackData {
-		if i == 6 {
-			y += 300
-			x = 0
-		} else if i != 0 {
-			x += 200
-		}
-		makePackFrame(ctx, config, state, idFont, i, float32(x), float32(y), 200, 300)
-	}
+	makeSidebarFrame(ctx, state, 0, 0, float32(sidebarWidth), float32(height))
+
+	// Automatic placement based on width and height of the "center" area
+	makeSegmentScreen(ctx, state, float32(sidebarWidth), 0, float32(width-sidebarWidth), float32(height-200))
 
 	// Position in the bottom of the window
-	makeLogFrame(ctx, state, 0, float32(height-400), float32(width), 400)
+	makeLogFrame(ctx, state, float32(sidebarWidth), float32(height-200), float32(width-sidebarWidth), 200)
 	//makeThresholdViewFrame(ctx, config, 0, 0, float32(width))
 
 	// Render
