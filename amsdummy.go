@@ -7,8 +7,8 @@ import (
 )
 
 func generateDataPackets() []string {
-	result := make([]string, 0, 12)
-	for packId := 0; packId < 12; packId++ {
+	result := make([]string, 0, 10)
+	for packId := 0; packId < 10; packId++ {
 		packLine := fmt.Sprintf("D%d|", packId)
 		for cellId := 0; cellId < 12; cellId++ {
 			voltage := int((rand.Float32() + 3.1) * 1000)
