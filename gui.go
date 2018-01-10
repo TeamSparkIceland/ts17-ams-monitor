@@ -90,7 +90,7 @@ func guiLoop(config *Config, state *State) {
 func makeSegmentScreen(ctx *nk.Context, state *State, x, y, w, h float32) {
 	var padding float32 = 10
 	segmentHeight := h - (2 * padding)
-	segmentCount := 5
+	segmentCount := 6
 	segmentWidth := (w - (padding * (float32(segmentCount) + 1))) / float32(segmentCount)
 
 	for segmentId := 0; segmentId < segmentCount; segmentId++ {

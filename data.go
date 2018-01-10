@@ -13,7 +13,7 @@ const (
 	PACKET_DELIMITER       = "|"
 	VALID_DELIMITER_COUNT  = 49 // 1 + 4 * packs = 1 + 4*12 = 1 + 48 = 49 .... 1 + 4 * 10 = 41
 	CELLS_IN_PACK          = 12
-	PACKS_IN_SYSTEM        = 10
+	PACKS_IN_SYSTEM        = 12
 	STATUS_DELIMITER_COUNT = 2
 	STATUS_START_CHAR      = 'S'
 )

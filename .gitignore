@@ -2,3 +2,5 @@
 bindata.go
 vendor/
 *.swp
+.git/
+.idea/
