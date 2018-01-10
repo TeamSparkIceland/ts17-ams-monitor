@@ -22,6 +22,9 @@ func dataReceiver(state *State, received <-chan string) {
 			if isStatusPacket(r) {
 				parseStatusPacket(r, state)
 			}
+			if isCurrentPacket(r) {
+				parseCurrentPacket(r, state)
+			}
 		}
 	}
 }

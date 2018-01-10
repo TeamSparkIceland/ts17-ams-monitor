@@ -21,6 +21,11 @@ func generateDataPackets() []string {
 	return result
 }
 
+func generateCurrentPacket() string {
+	current := int((rand.Float32() * 400 - 200) * 1000)
+	return fmt.Sprintf("C|%d|", current)
+}
+
 func generateStatusPacket() string {
 	voltage := int((rand.Float32() + 3.1) * 1000)
 	return fmt.Sprintf("S|%d|", voltage)
@@ -37,5 +42,6 @@ func dummyListen(received chan string, quitC chan struct{}) {
 			received <- line
 		}
 		received <- generateStatusPacket()
+		received <- generateCurrentPacket()
 	}
 }

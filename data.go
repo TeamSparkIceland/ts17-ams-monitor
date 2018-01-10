@@ -9,13 +9,15 @@ import (
 )
 
 const (
-	PACKET_START_CHAR      = 'D'
-	PACKET_DELIMITER       = "|"
-	VALID_DELIMITER_COUNT  = 49 // 1 + 4 * packs = 1 + 4*12 = 1 + 48 = 49 .... 1 + 4 * 10 = 41
-	CELLS_IN_PACK          = 12
-	PACKS_IN_SYSTEM        = 12
-	STATUS_DELIMITER_COUNT = 2
-	STATUS_START_CHAR      = 'S'
+	PACKET_START_CHAR       = 'D'
+	PACKET_DELIMITER        = "|"
+	VALID_DELIMITER_COUNT   = 49 // 1 + 4 * packs = 1 + 4*12 = 1 + 48 = 49 .... 1 + 4 * 10 = 41
+	CELLS_IN_PACK           = 12
+	PACKS_IN_SYSTEM         = 12
+	STATUS_DELIMITER_COUNT  = 2
+	STATUS_START_CHAR       = 'S'
+	CURRENT_DELIMITER_COUNT = 2
+	CURRENT_START_CHAR      = 'C'
 )
 
 func validatePacket(packet string, startChar byte, delimiterCount int) bool {
@@ -37,6 +39,20 @@ func isDataPacket(packet string) bool {
 
 func isStatusPacket(packet string) bool {
 	return validatePacket(packet, STATUS_START_CHAR, STATUS_DELIMITER_COUNT)
+}
+
+func isCurrentPacket(packet string) bool {
+	return validatePacket(packet, CURRENT_START_CHAR, CURRENT_DELIMITER_COUNT)
+}
+
+func parseCurrentPacket(packet string, state *State) {
+	parts := strings.Split(packet[1:], PACKET_DELIMITER)[1:]
+	current, err := strconv.Atoi(parts[0])
+	if err != nil {
+		log.Warnf("Failed to convert current %s to integer", parts[0])
+		return
+	}
+	state.Current = float32(current) / 1000.0
 }
 
 func parseStatusPacket(packet string, state *State) {

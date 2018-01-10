@@ -35,6 +35,7 @@ type State struct {
 	PackData               []Pack
 	DischargeRequested     bool
 	DischargeTargetVoltage float32
+	Current	      		   float32
 }
 
 func NewDefaultConfig() *Config {

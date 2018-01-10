@@ -23,6 +23,20 @@ func makeSidebarFrame(ctx *nk.Context, state *State, x, y, w, h float32) {
 
 	if update > 0 {
 		filler(ctx, 10)
+
+		// Prenta út straum
+		nk.NkLayoutRowDynamic(ctx, 14, 1)
+		{
+			// Búa til label
+			nk.NkLabel(ctx, "Current", nk.TextCentered)
+			// Búa til lit
+			currentColor := nk.NkRgba(102, 178, 255, 255)
+			// Búa tit label með texta "x.xx A" með litnum
+			nk.NkLabelColored(ctx, fmt.Sprintf("%.2f A", state.Current), nk.TextCentered, currentColor)
+		}
+
+		filler(ctx, 10)
+
 		nk.NkLayoutRowDynamic(ctx, 60, 1)
 		{
 
