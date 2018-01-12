@@ -50,7 +50,6 @@ func listen(port string, baudrate int, received chan<- string, outbound <-chan s
 
 		select {
 		case o := <-outbound:
-			log.Infof("Sending %s to serial", o)
 			s.Write([]byte(o))
 		case <-quitC:
 			return

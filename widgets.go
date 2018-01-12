@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/golang-ui/nuklear/nk"
+	"log"
 )
 
 const (
@@ -33,6 +34,25 @@ func makeSidebarFrame(ctx *nk.Context, state *State, x, y, w, h float32) {
 			currentColor := nk.NkRgba(102, 178, 255, 255)
 			// Búa tit label með texta "x.xx A" með litnum
 			nk.NkLabelColored(ctx, fmt.Sprintf("%.2f A", state.Current), nk.TextCentered, currentColor)
+		}
+
+		filler(ctx, 10)
+
+		// Segja AMS að senda gögn eða ekki
+		nk.NkLayoutRowDynamic(ctx, 60, 1)
+		{
+			if state.RequestData {
+				//nk.NkButtonSymbolLabel(ctx, nk.SymbolRectSolid, "Request data", nk.TextCentered)
+				if nk.NkButtonSymbolLabel(ctx, nk.SymbolRectSolid, "Request data", nk.TextCentered) > 0 {
+					state.RequestData = !state.RequestData
+					log.Println("Requesting data off, ", state.RequestData)
+				}
+			} else {
+				if nk.NkButtonSymbolLabel(ctx, nk.SymbolRectOutline, "Request data", nk.TextCentered) > 0 {
+					state.RequestData = !state.RequestData
+					log.Println("Requesting data on, ", state.RequestData)
+				}
+			}
 		}
 
 		filler(ctx, 10)

@@ -18,13 +18,14 @@ func dataReceiver(state *State, received <-chan string) {
 
 			if isDataPacket(r) {
 				parseDataPacket(r, state)
-			}
-			if isStatusPacket(r) {
+			} else if isStatusPacket(r) {
 				parseStatusPacket(r, state)
-			}
-			if isCurrentPacket(r) {
+			} else if isCurrentPacket(r) {
 				parseCurrentPacket(r, state)
+			} else {
+				log.Println(r)
 			}
+
 		}
 	}
 }
@@ -33,8 +34,11 @@ func dataSender(state *State, outbound chan<- string) {
 	lastDischargeState := state.DischargeRequested
 	for {
 		newDischargeState := state.DischargeRequested
+
 		if newDischargeState == lastDischargeState {
 			time.Sleep(500 * time.Millisecond)
+			outbound <- requestData(state)
+
 			continue
 		}
 
@@ -44,6 +48,29 @@ func dataSender(state *State, outbound chan<- string) {
 			outbound <- "D"
 		}
 		lastDischargeState = newDischargeState
+	}
+}
+
+func requestData(state *State) string{
+	if state.RequestData {
+		return "R"
+	} else {
+		return "N"
+	}
+}
+
+func requestData2(state *State, outbound chan<- string){
+	for {
+		time.Sleep(499 * time.Millisecond)
+		if state.RequestData {
+			log.Println("Sending r")
+			outbound <- "R"
+			continue
+		} else {
+			log.Println("Sending n")
+			outbound <- "N"
+			continue
+		}
 	}
 }
 
@@ -64,6 +91,7 @@ func app() {
 
 	go dataReceiver(state, received)
 	go dataSender(state, outbound)
+	//go requestData2(state, outbound)
 
 	state.PackData = createPackData(0.0, 0.0, false, false)
 

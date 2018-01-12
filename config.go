@@ -36,6 +36,7 @@ type State struct {
 	DischargeRequested     bool
 	DischargeTargetVoltage float32
 	Current	      		   float32
+	RequestData			   bool
 }
 
 func NewDefaultConfig() *Config {
@@ -49,5 +50,6 @@ func NewDefaultState() *State {
 		HideDataLog:        false,
 		LogData:            make([]string, 0, LOG_LINES_MAX),
 		DischargeRequested: false,
+		RequestData:		true,
 	}
 }
