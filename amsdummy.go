@@ -31,6 +31,20 @@ func generateStatusPacket() string {
 	return fmt.Sprintf("S|%d|", voltage)
 }
 
+func generateTSALPackets() []string {
+	result := make([]string, 0, 2)
+	for tsalID :=  0; tsalID < 4; tsalID++ {
+		statusBitBool := rand.Int() % 2 == 0 // random bool
+		statusBit := 0
+		if statusBitBool == true {
+			statusBit = 1
+			}
+		tsalLine := fmt.Sprintf("T%d|%d|", tsalID, statusBit)
+		result  = append(result, tsalLine)
+	}
+	return result
+}
+
 func dummyListen(received chan string, quitC chan struct{}) {
 	for {
 		select {
@@ -43,5 +57,9 @@ func dummyListen(received chan string, quitC chan struct{}) {
 		}
 		received <- generateStatusPacket()
 		received <- generateCurrentPacket()
+
+		for _, line := range generateTSALPackets() {
+			received <- line
+		}
 	}
 }

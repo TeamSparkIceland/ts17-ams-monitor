@@ -37,6 +37,35 @@ func makeSidebarFrame(ctx *nk.Context, state *State, x, y, w, h float32) {
 		}
 
 		filler(ctx, 10)
+		// TSAL Status flags
+		nk.NkLayoutRowDynamic(ctx, 14, 1)
+		{
+			// Búa til label
+			nk.NkLabel(ctx, "TSAL Status", nk.TextCentered)
+		}
+
+		// TSAL Status Airneg
+		nk.NkLayoutRowDynamic(ctx, 13, 1)
+		{
+			nk.NkOptionLabel(ctx, "Air Negative", flag(state.TsalAirNeg == true))
+		}
+		// TSAL Status Airpos
+		nk.NkLayoutRowDynamic(ctx, 13, 1)
+		{
+			nk.NkOptionLabel(ctx, "Air Positive", flag(state.TsalAirPos == true))
+		}
+		// TSAL Status Mc
+		nk.NkLayoutRowDynamic(ctx, 13, 1)
+		{
+			nk.NkOptionLabel(ctx, "Motorcontroller", flag(state.TsalMC == true))
+		}
+		// TSAL Status Con
+		nk.NkLayoutRowDynamic(ctx, 13, 1)
+		{
+			nk.NkOptionLabel(ctx, "Connector", flag(state.TsalConnector == true))
+		}
+
+		filler(ctx, 10)
 
 		// Segja AMS að senda gögn eða ekki
 		nk.NkLayoutRowDynamic(ctx, 60, 1)
@@ -82,6 +111,8 @@ func makeSidebarFrame(ctx *nk.Context, state *State, x, y, w, h float32) {
 				nk.NkLabelColored(ctx, fmt.Sprintf("%.2f V", state.DischargeTargetVoltage), nk.TextCentered, color)
 			}
 		}
+
+
 	}
 	nk.NkEnd(ctx)
 }

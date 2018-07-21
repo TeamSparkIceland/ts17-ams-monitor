@@ -22,10 +22,11 @@ func dataReceiver(state *State, received <-chan string) {
 				parseStatusPacket(r, state)
 			} else if isCurrentPacket(r) {
 				parseCurrentPacket(r, state)
+			} else if isTSALPacket(r) {
+				parseTSALPacket(r, state)
 			} else {
-				log.Println(r)
+				//log.Println(r)
 			}
-
 		}
 	}
 }
@@ -63,11 +64,9 @@ func requestData2(state *State, outbound chan<- string){
 	for {
 		time.Sleep(499 * time.Millisecond)
 		if state.RequestData {
-			log.Println("Sending r")
 			outbound <- "R"
 			continue
 		} else {
-			log.Println("Sending n")
 			outbound <- "N"
 			continue
 		}

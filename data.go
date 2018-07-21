@@ -18,6 +18,8 @@ const (
 	STATUS_START_CHAR       = 'S'
 	CURRENT_DELIMITER_COUNT = 2
 	CURRENT_START_CHAR      = 'C'
+	TSAL_DELIMITER_COUNT 	= 2
+	TSAL_START_CHAR			= 'T'
 )
 
 func validatePacket(packet string, startChar byte, delimiterCount int) bool {
@@ -43,6 +45,36 @@ func isStatusPacket(packet string) bool {
 
 func isCurrentPacket(packet string) bool {
 	return validatePacket(packet, CURRENT_START_CHAR, CURRENT_DELIMITER_COUNT)
+}
+
+func isTSALPacket(packet string) bool {
+	return validatePacket(packet, TSAL_START_CHAR, TSAL_DELIMITER_COUNT)
+}
+
+func parseTSALPacket(packet string, state *State){
+	parts := strings.Split(packet[1:], PACKET_DELIMITER)[1:]
+	tsalId, err := strconv.Atoi(packet[1:2])
+	if err != nil {
+		log.Warnf("Failed to convert TSAL ID %s to integer\n", packet[1:2])
+	} else {
+		tsalStatus, err := strconv.Atoi(parts[0])
+		if err != nil {
+			log.Warnf("Failed to convert Tsal Status bit to integer\n", parts[0])
+			return
+		}
+
+		switch tsalId {
+		case 0:
+			state.TsalAirNeg = tsalStatus == 1
+		case 1:
+			state.TsalAirPos = tsalStatus == 1
+		case 2:
+			state.TsalConnector = tsalStatus == 1
+		case 3:
+			state.TsalMC = tsalStatus == 1
+		}
+	}
+
 }
 
 func parseCurrentPacket(packet string, state *State) {
@@ -84,7 +116,7 @@ func parseDataPacket(packet string, state *State) {
 	}
 
 	// Traverse Cell indexes
-	for i := 0; i < 12; i++ {
+	for i := 0; i < CELLS_IN_PACK; i++ {
 		cellId, err := strconv.Atoi(parts[(1 + (4 * i))])
 		if err != nil {
 			log.Warnf("Failed to convert cell-id %s to integer\n", parts[(1+(3*i))])
