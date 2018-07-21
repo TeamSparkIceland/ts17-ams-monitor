@@ -60,19 +60,6 @@ func requestData(state *State) string{
 	}
 }
 
-func requestData2(state *State, outbound chan<- string){
-	for {
-		time.Sleep(499 * time.Millisecond)
-		if state.RequestData {
-			outbound <- "R"
-			continue
-		} else {
-			outbound <- "N"
-			continue
-		}
-	}
-}
-
 func app() {
 	config := NewDefaultConfig()
 	state := NewDefaultState()
@@ -85,12 +72,16 @@ func app() {
 		log.Warn("Using dummy data instead of live data (dryrun option)")
 		go dummyListen(received, quitC)
 	} else {
-		go listen(viper.GetString("port"), 115200, received, outbound, quitC)
+		if viper.GetString("port") == DefaultComPort {
+			port := GetPort()
+			go listen(port, BaudRate, received, outbound, quitC)
+		}  else {
+			go listen(viper.GetString("port"), BaudRate, received, outbound, quitC)
+		}
 	}
 
 	go dataReceiver(state, received)
 	go dataSender(state, outbound)
-	//go requestData2(state, outbound)
 
 	state.PackData = createPackData(0.0, 0.0, false, false)
 

@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	delimiter = '\n'
+	Delimiter = '\n'
+	BaudRate  = 115200
 )
 
 func connect(port string, baudrate int) *serial.Port {
@@ -39,7 +40,7 @@ func listen(port string, baudrate int, received chan<- string, outbound <-chan s
 			continue
 		}
 
-		if buf[0] == delimiter {
+		if buf[0] == Delimiter {
 			if len(data) > 0 {
 				received <- string(data[:])
 			}
