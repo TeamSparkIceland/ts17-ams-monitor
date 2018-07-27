@@ -31,38 +31,38 @@ func portScanListen(port string, baudrate int ) bool {
 
 	if err != nil {
 		return false
-	} else {
+	}
 
-		data := make([]byte, 0, 2048)
-		buf := make([]byte, 1)
+	data := make([]byte, 0, 2048)
+	buf := make([]byte, 1)
 
-		for i := 0; i < 50; i++ {
+	for i := 0; i < 50; i++ {
 
-			_, err := s.Read(buf)
+		_, err := s.Read(buf)
 
-			if err != nil {
-				log.Errorf("Failed to read serial port data: %v", err)
+		if err != nil {
+			log.Errorf("Failed to read serial port data: %v", err)
+			s.Close()
+			return false
+		}
+
+		if buf[0] == '\r' {
+			continue
+		}
+
+		b := buf[0]
+		if b == Delimiter || b == PACKET_START_CHAR || b == STATUS_START_CHAR || b == CURRENT_START_CHAR || b == TSAL_START_CHAR {
+			if len(data) > 0 {
+				log.Infof("Found data at port %s", port)
 				s.Close()
-				return false
+				return true
 			}
-
-			if buf[0] == '\r' {
-				continue
-			}
-
-			b := buf[0]
-			if b == Delimiter || b == PACKET_START_CHAR || b == STATUS_START_CHAR || b == CURRENT_START_CHAR || b == TSAL_START_CHAR {
-				if len(data) > 0 {
-					log.Infof("Found data at port %s", port)
-					s.Close()
-					return true
-				}
-				data = make([]byte, 0, 2048)
-			} else {
-				data = append(data, buf[0])
-			}
+			data = make([]byte, 0, 2048)
+		} else {
+			data = append(data, buf[0])
 		}
 	}
+
 	s.Close()
 	return false
 }
