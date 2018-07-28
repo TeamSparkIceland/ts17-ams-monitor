@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/golang-ui/nuklear/nk"
-	"log"
 )
 
 const (
@@ -65,24 +64,24 @@ func makeSidebarFrame(ctx *nk.Context, state *State, x, y, w, h float32) {
 			nk.NkOptionLabel(ctx, "Connector", flag(state.TsalConnector == true))
 		}
 
-		filler(ctx, 10)
 
 		// Segja AMS að senda gögn eða ekki
-		nk.NkLayoutRowDynamic(ctx, 60, 1)
-		{
-			if state.RequestData {
-				//nk.NkButtonSymbolLabel(ctx, nk.SymbolRectSolid, "Request data", nk.TextCentered)
-				if nk.NkButtonSymbolLabel(ctx, nk.SymbolRectSolid, "Request data", nk.TextCentered) > 0 {
-					state.RequestData = !state.RequestData
-					log.Println("Requesting data off, ", state.RequestData)
-				}
-			} else {
-				if nk.NkButtonSymbolLabel(ctx, nk.SymbolRectOutline, "Request data", nk.TextCentered) > 0 {
-					state.RequestData = !state.RequestData
-					log.Println("Requesting data on, ", state.RequestData)
-				}
-			}
-		}
+		//filler(ctx, 10)
+		//nk.NkLayoutRowDynamic(ctx, 60, 1)
+		//{
+		//	if state.RequestData {
+		//		//nk.NkButtonSymbolLabel(ctx, nk.SymbolRectSolid, "Request data", nk.TextCentered)
+		//		if nk.NkButtonSymbolLabel(ctx, nk.SymbolRectSolid, "Request data", nk.TextCentered) > 0 {
+		//			state.RequestData = !state.RequestData
+		//			log.Println("Requesting data off, ", state.RequestData)
+		//		}
+		//	} else {
+		//		if nk.NkButtonSymbolLabel(ctx, nk.SymbolRectOutline, "Request data", nk.TextCentered) > 0 {
+		//			state.RequestData = !state.RequestData
+		//			log.Println("Requesting data on, ", state.RequestData)
+		//		}
+		//	}
+		//}
 
 		filler(ctx, 10)
 
@@ -114,7 +113,7 @@ func makeSidebarFrame(ctx *nk.Context, state *State, x, y, w, h float32) {
 
 
 	}
-	nk.NkEnd(ctx)
+	nk.NkEnd(ctx)//
 }
 
 func makeSegmentFrame(ctx *nk.Context, state *State, segmentId int, x, y, w, h float32) {

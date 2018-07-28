@@ -38,8 +38,7 @@ func dataSender(state *State, outbound chan<- string) {
 
 		if newDischargeState == lastDischargeState {
 			time.Sleep(500 * time.Millisecond)
-			outbound <- requestData(state)
-
+			//outbound <- requestData(state)
 			continue
 		}
 
