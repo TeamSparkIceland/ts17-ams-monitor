@@ -157,9 +157,25 @@ func makePackLayout(ctx *nk.Context, state *State, packId int) {
 				color := nk.NkRgba(102, 178, 255, 255)
 				nk.NkLabelColored(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft, color)
 			} else {
-				nk.NkLabel(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft)
+				// Rautt við/undir lágmarks og yfir hámarks og appelsínugult nálægt því
+				switch {
+				case cell.Voltage <= 3.4 || cell.Voltage >= 4.2:
+					nk.NkLabelColored(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft, nk.NkRgba(255,0,0,255))
+				case cell.Voltage <= 3.6:
+					nk.NkLabelColored(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft, nk.NkRgba(255,100,0,255))
+				default:
+					nk.NkLabel(ctx, fmt.Sprintf("%.2f V", cell.Voltage), nk.TextLeft)
+				}
 			}
-			nk.NkLabel(ctx, fmt.Sprintf("%.2f C", cell.Temperature), nk.TextLeft)
+			// rautt við ofhitnun og ofkólnun og appelsínugult ef nálægt því
+			switch {
+			case cell.Temperature >= 58 || cell.Temperature <= 10:
+				nk.NkLabelColored(ctx, fmt.Sprintf("%.2f C", cell.Temperature), nk.TextLeft, nk.NkRgba(255,0,0,255))
+			case cell.Temperature >= 45 || cell.Temperature <= 15:
+				nk.NkLabelColored(ctx, fmt.Sprintf("%.2f C", cell.Temperature), nk.TextLeft, nk.NkRgba(255, 100, 0, 255))
+			default:
+				nk.NkLabel(ctx, fmt.Sprintf("%.2f C", cell.Temperature), nk.TextLeft)
+			}
 		}
 	}
 }
